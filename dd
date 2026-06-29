@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 할 일</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #FAF7F0;
+    --card: #FFFFFF;
+    --ink: #2B2B27;
+    --ink-soft: #767168;
+    --teal: #1D9E75;
+    --teal-soft: #E1F5EE;
+    --line: #EAE5D9;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--cream);
+    font-family: 'Inter', sans-serif;
+    color: var(--ink);
+    display: flex;
+    justify-content: center;
+    padding: 56px 20px;
+  }
+  .sheet {
+    width: 100%;
+    max-width: 440px;
+  }
+  .eyebrow {
+    font-size: 13px;
+    color: var(--ink-soft);
+    letter-spacing: 0.04em;
+    margin-bottom: 6px;
+  }
+  h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 30px;
+    margin: 0 0 24px;
+    letter-spacing: -0.01em;
+  }
+  .add-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 28px;
+  }
+  .add-row input {
+    flex: 1;
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    padding: 13px 14px;
+    font-size: 15px;
+    font-family: inherit;
+    background: var(--card);
+    color: var(--ink);
+  }
+  .add-row input:focus {
+    outline: none;
+    border-color: var(--teal);
+  }
+  .add-row button {
+    border: none;
+    border-radius: 10px;
+    background: var(--ink);
+    color: #fff;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 500;
+    padding: 0 20px;
+    cursor: pointer;
+  }
+  .add-row button:hover { background: var(--teal); }
+ 
+  ul#list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 13px 14px;
+  }
+  .check {
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
+    border-radius: 50%;
+    border: 1.5px solid var(--ink-soft);
+    cursor: pointer;
+    position: relative;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .check.done {
+    background: var(--teal);
+    border-color: var(--teal);
+  }
+  .check.done::after {
+    content: "";
+    position: absolute;
+    left: 6px;
+    top: 2px;
+    width: 6px;
+    height: 11px;
+    border-right: 2px solid #fff;
+    border-bottom: 2px solid #fff;
+    transform: rotate(45deg);
+  }
+  .label {
+    flex: 1;
+    font-size: 15px;
+    cursor: pointer;
+  }
+  .label.done {
+    color: var(--ink-soft);
+    text-decoration: line-through;
+  }
+  .remove {
+    border: none;
+    background: none;
+    color: var(--ink-soft);
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 4px;
+  }
+  .remove:hover { color: #C04828; }
+ 
+  .empty {
+    text-align: center;
+    color: var(--ink-soft);
+    font-size: 14px;
+    padding: 32px 0;
+    border: 1px dashed var(--line);
+    border-radius: 10px;
+  }
+  .counter {
+    margin-top: 18px;
+    font-size: 13px;
+    color: var(--ink-soft);
+    text-align: right;
+  }
+</style>
+</head>
+<body>
+  <div class="sheet">
+    <div class="eyebrow">연습용 웹사이트</div>
+    <h1>오늘의 할 일</h1>
+ 
+    <div class="add-row">
+      <input id="taskInput" type="text" placeholder="할 일을 입력하세요" />
+      <button onclick="addTask()">추가</button>
+    </div>
+ 
+    <ul id="list"></ul>
+    <div class="counter" id="counter"></div>
+  </div>
+ 
+<script>
+  let tasks = [
+    { text: "사이트 만들기 연습하기", done: false },
+    { text: "체크박스 눌러보기", done: false }
+  ];
+ 
+  function render() {
+    const list = document.getElementById('list');
+    const counter = document.getElementById('counter');
+    list.innerHTML = "";
+ 
+    if (tasks.length === 0) {
+      list.innerHTML = '<div class="empty">아직 할 일이 없습니다. 위에 입력해 보세요.</div>';
+      counter.textContent = "";
+      return;
+    }
+ 
+    tasks.forEach((task, index) => {
+      const li = document.createElement('li');
+ 
+      const check = document.createElement('div');
+      check.className = 'check' + (task.done ? ' done' : '');
+      check.onclick = () => toggleTask(index);
+ 
+      const label = document.createElement('div');
+      label.className = 'label' + (task.done ? ' done' : '');
+      label.textContent = task.text;
+      label.onclick = () => toggleTask(index);
+ 
+      const remove = document.createElement('button');
+      remove.className = 'remove';
+      remove.innerHTML = '&times;';
+      remove.onclick = () => removeTask(index);
+ 
+      li.appendChild(check);
+      li.appendChild(label);
+      li.appendChild(remove);
+      list.appendChild(li);
+    });
+ 
+    const doneCount = tasks.filter(t => t.done).length;
+    counter.textContent = doneCount + " / " + tasks.length + " 완료";
+  }
+ 
+  function addTask() {
+    const input = document.getElementById('taskInput');
+    const text = input.value.trim();
+    if (text === "") return;
+    tasks.push({ text: text, done: false });
+    input.value = "";
+    render();
+  }
+ 
+  function toggleTask(index) {
+    tasks[index].done = !tasks[index].done;
+    render();
+  }
+ 
+  function removeTask(index) {
+    tasks.splice(index, 1);
+    render();
+  }
+ 
+  document.getElementById('taskInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') addTask();
+  });
+ 
+  render();
+</script>
+</body>
+</html>
